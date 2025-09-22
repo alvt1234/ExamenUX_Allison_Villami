@@ -25,14 +25,25 @@ router.get("/tours" ,async (req, res) =>{
 Devuelve la disponibilidad de los tours en base a la fecha actual, solamente de fechas 
 futuras.Tampoco devuelve las horas que ya han sido reservadas.*/
 router.get("/tours/availability" ,async (req, res) =>{
-  const id= req.body;
+  const {tour_id} = req.body;
   try{
-    const sql=await pool.query("select tour_id,seats_available,schedule_time from tourapp.tour_schedules where tour_id=$1 and schedule_time>=now() and seats_available<=20",[id]);
+    const sql=await pool.query("select seats_available,schedule_time from tourapp.tour_schedules where tour_id=$1 and schedule_time>=now() and seats_available<=20 ",[tour_id]);
+    res.json(sql.rows);
+  }catch(err){
+    res.status(500).json("Error al devolver los tours");
+  }
+} );
+
+/* Endpoint para reservar un tour a una hora específica. Setea en true la columna reserved.
+ Actualiza la columna reservedBy con el personName.*/
+
+ router.put("/tours/reserve" ,async (req, res) =>{
+  const {personName,tour_schedule_id,reserved_at}= req.body;
+  try{
+    const sql=await pool.query("update tourapp.reservations set person_name=$1, status=TRUE where tour_schedule_id=$2 and reserved_at=$3 and status=false ", [personName,tour_schedule_id,reserved_at]);
     res.json(sql.rows);
   }catch(err){
     res.status(500).json("Eroor al devolver los tours");
   }
 } );
-
-
 module.exports = router;
