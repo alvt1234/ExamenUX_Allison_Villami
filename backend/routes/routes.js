@@ -15,7 +15,7 @@ router.get("/tours" ,async (req, res) =>{
   const offset= parseInt(req.query.offset) || 0;
 
   try{
-    const sql=await pool.query("select * from tourapp.tours limit 10 offset 0;");
+    const sql=await pool.query("select * from tourapp.tours limit $1 offset $2",[limit, offset]);
     res.json(sql.rows);
   }catch(err){
     res.status(500).json("Eroor al listar los tours");
@@ -24,5 +24,15 @@ router.get("/tours" ,async (req, res) =>{
 /*	
 Devuelve la disponibilidad de los tours en base a la fecha actual, solamente de fechas 
 futuras.Tampoco devuelve las horas que ya han sido reservadas.*/
+router.get("/tours/availability" ,async (req, res) =>{
+  const id= req.body;
+  try{
+    const sql=await pool.query("select tour_id,seats_available,schedule_time from tourapp.tour_schedules where tour_id=$1 and schedule_time>=now() and seats_available<=20",[id]);
+    res.json(sql.rows);
+  }catch(err){
+    res.status(500).json("Eroor al devolver los tours");
+  }
+} );
+
 
 module.exports = router;
