@@ -12,8 +12,7 @@ export default function Tours() {
         const fetchTours = async () => {
             try {
                 const data = await getTours();
-                settours(data);
-                dispatch({ type: 'settours', payload: data });
+                dispatch(settours(data.data));
             } catch (error) {
                 console.error('Error fetching tours:', error);
             }
@@ -26,8 +25,9 @@ export default function Tours() {
            <h2> TOURS</h2>  
            {toursState.map((tour) => (
             <>
-              <Col md={13} key={tour.id}/>
+              <Col md={13} key={tour.id}>
               <TourCard tour={tour} />
+              </Col>
             </>
            ))}
         </Container>
